@@ -1,4 +1,6 @@
-commandList = ["help", "exit", "math"]
+import random
+
+commandList = ["help", "exit", "math", "dice"]
 want2exit = False
 
 while not want2exit:
@@ -30,6 +32,12 @@ while not want2exit:
                     print("Invalid input")
             else:
                 print("Invalid operation")
+        elif command==commandList[3]:
+            sides = input("How many sides on your dice? ")
+            try:
+                print("You rolled a " + str(random.randint(1, int(sides))))
+            except:
+                print("A dice cannot have " + sides + " sides!")
         else:
             print("Something happened that shouldn't have happened...?")
     else:
