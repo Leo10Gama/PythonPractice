@@ -5,7 +5,7 @@ import math
 
 class TwoDimensionalShape:
     def __init__(self):
-        self.exists, self.shape, self.name = False, "None", ""
+        self.exists, self.shape, self.name = False, "", ""
 
     def __str__(self):
         # Function to print dimensional values
@@ -138,10 +138,39 @@ class Triangle(TwoDimensionalShape):
         return self.a + self.b + self.c
 
 
+class Ellipse(TwoDimensionalShape):
+    def __init__(self, name, radius1=0, radius2=0):
+        self.exists = radius1 > 0 and radius2 > 0
+        self.name = name
+        self.r1 = radius1
+        self.r2 = radius2
+        if radius1 == radius2:
+            self.shape = "Circle"
+        else:
+            self.shape = "Ellipse"
+
+    def __str__(self):
+        return "Dimensions of " + self.shape + " " + self.name + "\nRadius 1 = " + str(self.r1) + "\nRadius 2 = " + str(self.r2)
+
+    def get_area(self):
+        # Note that if r1==r2, formula evaluates to pi * r ** 2
+        return math.pi * self.r1 * self.r2
+
+    def get_perimeter(self):
+        # Note that if r1==r2, h=0 and the below formula simplifies to 2r(pi)
+        h = ((self.r1 - self.r2) ** 2) / ((self.r1 + self.r2) ** 2)
+        return math.pi * (self.r1 + self.r2) * (1 + ((3 * h) / (10 + math.sqrt(4 - (3 * h)))))
+
+
+class Circle(Ellipse):
+    def __str__(self):
+        return "Dimensions of " + self.shape + " " + self.name + "\nRadius = " + str(self.r1)
+
+
 geometryCommands = ["back", "help", "create",
                     "area", "perimeter", "shapes", "view"]
 twoDimensionalShapes = ["trapezoid", "isosceles trapezoid",
-                        "parallelogram", "rhombus", "rectangle", "square", "triangle"]
+                        "parallelogram", "rhombus", "rectangle", "square", "triangle", "ellipse", "circle"]
 myShapes = {}
 BAD_INPUT = "Improper input. Returning to geometry menu...\n"
 BAD_SHAPE = "Dimensions create an improper shape. Returning to geometry menu...\n"
@@ -170,16 +199,16 @@ def geometryMode():
             shape = input("\nWhat type of shape would you like to create? ")
             # Make a trapezoid
             if shape.lower() == twoDimensionalShapes[0]:
-                add_shape(shape.lower(), input("Enter a name for your Trapezoid: "), [input("Enter side a: "), input(
-                    "Enter side b: "), input("Enter side c: "), input("Enter side d: ")])
+                add_shape(shape.lower(), input("Enter a name for your Trapezoid: "), [input(
+                    "Enter side a: "), input("Enter side b: "), input("Enter side c: "), input("Enter side d: ")])
             # Make an isosceles trapezoid
             elif shape.lower() == twoDimensionalShapes[1]:
-                add_shape(shape.lower(), input("Enter a name for your Isosceles Trapezoid: "), [input("Enter side a: "), input(
-                    "Enter side b: "), input("Enter height: ")])
+                add_shape(shape.lower(), input("Enter a name for your Isosceles Trapezoid: "), [
+                          input("Enter side a: "), input("Enter side b: "), input("Enter height: ")])
             # Make a parallelogram
             elif shape.lower() == twoDimensionalShapes[2]:
-                add_shape(shape.lower(), input("Enter a name for your Parallelogram: "), [input("Enter side a: "), input(
-                    "Enter side b: "), input("Enter height: ")])
+                add_shape(shape.lower(), input("Enter a name for your Parallelogram: "), [
+                          input("Enter side a: "), input("Enter side b: "), input("Enter height: ")])
             # Make a rhombus
             elif shape.lower() == twoDimensionalShapes[3]:
                 add_shape(shape.lower(), input("Enter a name for your Rhombus: "), [
@@ -187,31 +216,37 @@ def geometryMode():
             # Make a rectangle
             elif shape.lower() == twoDimensionalShapes[4]:
                 add_shape(shape.lower(), input("Enter a name for your Rectangle: "), [
-                    input("Enter width: "), input("Enter height: ")])
+                          input("Enter width: "), input("Enter height: ")])
             # Make a square
             elif shape.lower() == twoDimensionalShapes[5]:
                 add_shape(shape.lower(), input("Enter a name for your Square: "), [
                           input("Enter side length: ")])
             # Make a triangle
             elif shape.lower() == twoDimensionalShapes[6]:
-                add_shape(shape.lower(), input("Enter a name for your Triangle: "), [input("Enter side a: "), input(
-                    "Enter side b: "), input("Enter side c: ")])
+                add_shape(shape.lower(), input("Enter a name for your Triangle: "), [
+                          input("Enter side a: "), input("Enter side b: "), input("Enter side c: ")])
+            # Make an ellipse
+            elif shape.lower() == twoDimensionalShapes[7]:
+                add_shape(shape.lower(), input("Enter a name for your Ellipse: "), [
+                          input("Enter radius 1: "), input("Enter radius 2: ")])
+            # Make a circle
+            elif shape.lower() == twoDimensionalShapes[8]:
+                add_shape(shape.lower(), input("Enter a name for your Circle: "), [
+                          input("Enter radius: ")])
             # No proper shape entered
             else:
                 print(BAD_INPUT)
         # Area command
         elif command == geometryCommands[3]:
-            for item in myShapes:
-                print(item + " (" + myShapes[item].shape + ")")
+            display_shapes()
             shape = input("\nWhich shape would you like to get the area of? ")
             if shape in myShapes:
                 print("Area = " + str(myShapes[shape].get_area()) + "\n")
             else:
                 print("Shape not found.\n")
         # Perimeter command
-        elif command == geometryCommands[4]:
-            for item in myShapes:
-                print(item + " (" + myShapes[item].shape + ")")
+        elif command == geometryCommands[4] or command == "circumference":
+            display_shapes()
             shape = input(
                 "\nWhich shape would you like to get the perimeter/circumference of? ")
             if shape in myShapes:
@@ -222,12 +257,10 @@ def geometryMode():
         # Shapes command (lists all current shapes)
         elif command == geometryCommands[5]:
             print("Current shapes:")
-            for item in myShapes:
-                print(item + " (" + myShapes[item].shape + ")")
+            display_shapes()
         # View command (see dimensions of a shape)
         elif command == geometryCommands[6]:
-            for item in myShapes:
-                print(item + " (" + myShapes[item].shape + ")")
+            display_shapes()
             shape = input(
                 "\nWhich shape would you like to see the dimensions of? ")
             if shape in myShapes:
@@ -237,7 +270,6 @@ def geometryMode():
         # Command not recognized
         else:
             print("No command by that name. Try typing 'list'\n")
-
     return
 
 
@@ -271,6 +303,14 @@ def add_shape(shape, shapeName, shapeProperties):
         elif shape == twoDimensionalShapes[6]:
             shape2add = Triangle(shapeName, float(shapeProperties[0]), float(
                 shapeProperties[1]), float(shapeProperties[2]))
+        # Ellipse
+        elif shape == twoDimensionalShapes[7]:
+            shape2add = Ellipse(shapeName, float(
+                shapeProperties[0]), float(shapeProperties[1]))
+        # Circle
+        elif shape == twoDimensionalShapes[8]:
+            shape2add = Circle(shapeName, float(
+                shapeProperties[0]), float(shapeProperties[0]))
         # Now decide if the shape is actually a shape
         if shape2add.exists:
             myShapes[shapeName] = shape2add
@@ -279,3 +319,8 @@ def add_shape(shape, shapeName, shapeProperties):
             print(BAD_SHAPE)
     else:
         print(BAD_INPUT)
+
+
+def display_shapes():
+    for item in myShapes:
+        print(item + " (" + myShapes[item].shape + ")")
