@@ -203,11 +203,64 @@ class Sphere(Spheroid):
         return "Dimensions of " + self.shape + " " + self.name + "\nRadius r = " + str(self.a)
 
 
+class Cone(Shape):
+    def __init__(self, name, r=0, h=0):
+        self.exists = r > 0 and h > 0
+        self.name = name
+        self.shape = "Cone"
+        self.r, self.h = r, h
+        self.l = math.sqrt((r ** 2) + (h ** 2))
+
+    def __str__(self):
+        return "Dimensions of " + self.shape + " " + self.name + "\nRadius r = " + str(self.r) + "\nHeight h = " + str(self.h) + "\nSlant height l = " + str(self.l)
+
+    def get_surface_area(self):
+        return (math.pi * self.r * self.r) + (math.pi * self.r * self.l)
+
+    def get_volume(self):
+        return (1 / 3) * math.pi * self.r * self.r * self.h
+
+
+class Cylinder(Shape):
+    def __init__(self, name, r=0, h=0):
+        self.exists = r > 0 and h > 0
+        self.name = name
+        self.shape = "Cylinder"
+        self.r, self.h = r, h
+
+    def __str__(self):
+        return "Dimensions of " + self.shape + " " + self.name + "\nRadius r = " + str(self.r) + "\nHeight h = " + str(self.h)
+
+    def get_surface_area(self):
+        return (2 * math.pi * self.r) * (self.h + self.r)
+
+    def get_volume(self):
+        return math.pi * self.r * self.r * self.h
+
+
+class Prism(Shape):
+    def __init__(self, name, n=0, s=0, h=0):
+        self.exists = n > 2 and s > 0 and h > 0
+        self.name = name
+        self.shape = str(n) + "-sided face Prism"
+        self.n, self.s, self.h = n, s, h
+
+    def __str__(self):
+        return "Dimensions of " + self.shape + " " + self.name + "\nSide length s = " + str(self.s) + "\nHeight h = " + str(self.h)
+
+    def get_surface_area(self):
+        return (self.n / 2) * self.s * self.s * (math.cos(math.pi / self.n) / math.sin(math.pi / self.n)) + self.n * self.s * self.h
+
+    def get_volume(self):
+        return (self.n / 4) * self.h * self.s * self.s * (math.cos(math.pi / self.n) / math.sin(math.pi / self.n))
+
+
 geometryCommands = ["back", "help", "create",
                     "area", "perimeter", "shapes", "view", "surface area", "volume"]
 twoDimensionalShapes = ["trapezoid", "isosceles trapezoid",
                         "parallelogram", "rhombus", "rectangle", "square", "triangle", "ellipse", "circle"]
-threeDimensionalShapes = ["ellipsoid", "spheroid", "sphere"]
+threeDimensionalShapes = ["ellipsoid",
+                          "spheroid", "sphere", "cone", "cylinder", "prism"]
 myShapes = {}
 BAD_INPUT = "Improper input. Returning to geometry menu...\n"
 BAD_SHAPE = "Dimensions create an improper shape. Returning to geometry menu...\n"
@@ -291,13 +344,28 @@ def geometryMode():
                     add_shape(shape.lower(), input("Enter a name for your Ellipsoid: "), [input(
                         "Enter radius a: "), input("Enter radius b: "), input("Enter radius c: ")])
                 # Make a spheroid
-                if shape.lower() == threeDimensionalShapes[1]:
+                elif shape.lower() == threeDimensionalShapes[1]:
                     add_shape(shape.lower(), input("Enter a name for your Spheroid: "), [
                               input("Enter radius a: "), input("Enter radius c: ")])
                 # Make a sphere
-                if shape.lower() == threeDimensionalShapes[2]:
+                elif shape.lower() == threeDimensionalShapes[2]:
                     add_shape(shape.lower(), input("Enter a name for your Sphere: "), [
                               input("Enter a radius: ")])
+                # Make a cone
+                elif shape.lower() == threeDimensionalShapes[3]:
+                    add_shape(shape.lower(), input("Enter a name for your Cone: "), [
+                              input("Enter radius: "), input("Enter height: ")])
+                # Make a cylinder
+                elif shape.lower() == threeDimensionalShapes[4]:
+                    add_shape(shape.lower(), input("Enter a name for your Cylinder: "), [
+                              input("Enter radius: "), input("Enter height: ")])
+                # Make a prism
+                elif shape.lower() == threeDimensionalShapes[5]:
+                    add_shape(shape.lower(), input("Enter a name for your Prism: "), [input(
+                        "How many sides will the prism's face have? "), input("How long will each side of the face be? "), input("Enter height: ")])
+                # No proper shape entered
+                else:
+                    print(BAD_INPUT)
             # No proper shape entered
             else:
                 print(BAD_INPUT)
@@ -335,15 +403,18 @@ def geometryMode():
         # Surface Area command
         elif command == geometryCommands[7]:
             display_shapes()
-            shape = input("\nWhich shape would you like to get the surface area of? ")
+            shape = input(
+                "\nWhich shape would you like to get the surface area of? ")
             if shape in myShapes:
-                print("\nSurface Area = " + str(myShapes[shape].get_surface_area()))
+                print("\nSurface Area = " +
+                      str(myShapes[shape].get_surface_area()))
             else:
                 print(NO_SHAPE)
         # Volume command
         elif command == geometryCommands[8]:
             display_shapes()
-            shape = input("\nWhich shape would you like to get the volume of? ")
+            shape = input(
+                "\nWhich shape would you like to get the volume of? ")
             if shape in myShapes:
                 print("\nVolume = " + str(myShapes[shape].get_volume()))
             else:
@@ -404,6 +475,18 @@ def add_shape(shape, shapeName, shapeProperties):
         elif shape == threeDimensionalShapes[2]:
             shape2add = Sphere(shapeName, float(shapeProperties[0]), float(
                 shapeProperties[0]), float(shapeProperties[0]))
+        # Cone
+        elif shape == threeDimensionalShapes[3]:
+            shape2add = Cone(shapeName, float(
+                shapeProperties[0]), float(shapeProperties[1]))
+        # Cylinder
+        elif shape == threeDimensionalShapes[4]:
+            shape2add = Cylinder(shapeName, float(
+                shapeProperties[0]), float(shapeProperties[1]))
+        # Prism
+        elif shape == threeDimensionalShapes[5]:
+            shape2add = Prism(shapeName, int(shapeProperties[0]), float(
+                shapeProperties[1]), float(shapeProperties[2]))
         # Now decide if the shape is actually a shape
         if shape2add.exists:
             myShapes[shapeName] = shape2add
