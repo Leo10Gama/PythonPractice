@@ -255,12 +255,28 @@ class Prism(Shape):
         return (self.n / 4) * self.h * self.s * self.s * (math.cos(math.pi / self.n) / math.sin(math.pi / self.n))
 
 
+class Pyramid(Prism):
+    def __init__(self, name, n=0, s=0, h=0):
+        super().__init__(name, n, s, h)
+        self.shape = str(n) + "-sided face Pyramid"
+
+    def get_surface_area(self):
+        p = self.n * self.s
+        a = self.s / (2 * math.tan((2 * math.pi) / self.n))
+        l = math.sqrt((a ** 2) + (self.h ** 2))
+        B = (p * a) / 2
+        return ((p * l) / 2) + B
+
+    def get_volume(self):
+        return (self.n / 12) * self.h * self.s * self.s * (math.cos(math.pi / self.n) / math.sin(math.pi / self.n))
+
+
 geometryCommands = ["back", "help", "create",
                     "area", "perimeter", "shapes", "view", "surface area", "volume"]
 twoDimensionalShapes = ["trapezoid", "isosceles trapezoid",
                         "parallelogram", "rhombus", "rectangle", "square", "triangle", "ellipse", "circle"]
 threeDimensionalShapes = ["ellipsoid",
-                          "spheroid", "sphere", "cone", "cylinder", "prism"]
+                          "spheroid", "sphere", "cone", "cylinder", "prism", "pyramid"]
 myShapes = {}
 BAD_INPUT = "Improper input. Returning to geometry menu...\n"
 BAD_SHAPE = "Dimensions create an improper shape. Returning to geometry menu...\n"
@@ -363,6 +379,10 @@ def geometryMode():
                 elif shape.lower() == threeDimensionalShapes[5]:
                     add_shape(shape.lower(), input("Enter a name for your Prism: "), [input(
                         "How many sides will the prism's face have? "), input("How long will each side of the face be? "), input("Enter height: ")])
+                # Make a pyramid
+                elif shape.lower() == threeDimensionalShapes[6]:
+                    add_shape(shape.lower(), input("Enter a name for your Pyramid: "), [input(
+                        "How many sides will the pyramid's face have? "), input("How long will each side of the face be? "), input("Enter height: ")])
                 # No proper shape entered
                 else:
                     print(BAD_INPUT)
@@ -486,6 +506,10 @@ def add_shape(shape, shapeName, shapeProperties):
         # Prism
         elif shape == threeDimensionalShapes[5]:
             shape2add = Prism(shapeName, int(shapeProperties[0]), float(
+                shapeProperties[1]), float(shapeProperties[2]))
+        # Pyramid
+        elif shape == threeDimensionalShapes[6]:
+            shape2add = Pyramid(shapeName, int(shapeProperties[0]), float(
                 shapeProperties[1]), float(shapeProperties[2]))
         # Now decide if the shape is actually a shape
         if shape2add.exists:
