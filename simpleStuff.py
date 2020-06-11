@@ -1,8 +1,9 @@
 import random
 import math
 import geometry
+import convert
 
-commandList = ["help", "exit", "math", "dice", "palindrome", "geometry"]
+commandList = ["help", "exit", "math", "dice", "palindrome", "geometry", "convert"]
 geometryList = ["back"]
 want2exit = False
 
@@ -69,6 +70,9 @@ while not want2exit:
         elif command == commandList[5]:
             print("Entering geometry mode...")
             geometry.geometryMode()
+        # Convert command
+        elif command == commandList[6]:
+            convert.do_a_conversion()
         # TODO: Add more commands here
         # This line should technically never run but just in case it's here
         else:
