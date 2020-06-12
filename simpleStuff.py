@@ -2,8 +2,9 @@ import random
 import math
 import geometry
 import convert
+import piglatin
 
-commandList = ["help", "exit", "math", "dice", "palindrome", "geometry", "convert"]
+commandList = ["help", "exit", "math", "dice", "palindrome", "geometry", "convert", "piglatin"]
 geometryList = ["back"]
 want2exit = False
 
@@ -73,6 +74,9 @@ while not want2exit:
         # Convert command
         elif command == commandList[6]:
             convert.do_a_conversion()
+        # Pig Latin command
+        elif command == commandList[7]:
+            print(piglatin.to_piglatin(input("Enter a phrase: ").lower()))
         # TODO: Add more commands here
         # This line should technically never run but just in case it's here
         else:
