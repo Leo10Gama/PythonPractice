@@ -3,8 +3,9 @@ import math
 import geometry
 import convert
 import piglatin
+import coin_search as coins
 
-commandList = ["help", "exit", "math", "dice", "palindrome", "geometry", "convert", "piglatin"]
+commandList = ["help", "exit", "math", "dice", "palindrome", "geometry", "convert", "piglatin", "coin"]
 geometryList = ["back"]
 want2exit = False
 
@@ -77,6 +78,9 @@ while not want2exit:
         # Pig Latin command
         elif command == commandList[7]:
             print(piglatin.to_piglatin(input("Enter a phrase: ").lower()))
+        # Coin command
+        elif command == commandList[8]:
+            coins.browse_catalogue()
         # TODO: Add more commands here
         # This line should technically never run but just in case it's here
         else:
