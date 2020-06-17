@@ -4,14 +4,15 @@ import geometry
 import convert
 import piglatin
 import coin_search as coins
+import minecraft as mc
 
-commandList = ["help", "exit", "math", "dice", "palindrome", "geometry", "convert", "piglatin", "coin"]
+commandList = ["help", "exit", "math", "dice", "palindrome", "geometry", "convert", "piglatin", "coin", "minecraft"]
 geometryList = ["back"]
 want2exit = False
 
 # Here is the main function
 while not want2exit:
-    command = input("Please enter a command (or type 'help'): ")
+    command = input("Please enter a command (or type 'help'): ").lower()
     print("\n")
     if command in commandList:
         # Help command
@@ -81,6 +82,10 @@ while not want2exit:
         # Coin command
         elif command == commandList[8]:
             coins.browse_catalogue()
+        # Minecraft command
+        elif command == commandList[9]:
+            print("Entering Minecraft mode...")
+            mc.minecraft_mode()
         # TODO: Add more commands here
         # This line should technically never run but just in case it's here
         else:
