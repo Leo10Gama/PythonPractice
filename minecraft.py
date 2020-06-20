@@ -63,11 +63,15 @@ def minecraft_mode():
             mob = input("\nWhich mob would you like to see? ").lower()
             if mob in mobs:
                 mob_info = BeautifulSoup(requests.get(DEFAULT_LINK + mobs[mob]).content, 'html.parser').find("table", class_="infobox-rows").find_all("tr")
-                print("\n" + mob.title())
+                print("\n\n" + mob.upper() + "\n")
                 for row in mob_info:
                     print(row.find("th").text.replace("\n","") + ": ")
                     for paragraph in row.find("td").find_all("p"):
-                        print("\t" + paragraph.text.replace("\n",""))
+                        for span in paragraph.find_all("span"):
+                            span.replace_with("")
+                        for br in paragraph.find_all("br"):
+                            br.replace_with("\n")
+                        print("\t" + re.sub(r"\n+", "\n", paragraph.text).replace("\n","\n\t"))
             else:
                 print("\nNo mob by that name found")
 
