@@ -4,7 +4,8 @@ import re
 
 DEFAULT_LINK = "https://minecraft.gamepedia.com"
 commandList = ["help", "back", "brewing", "mob"]
-
+potions = {}
+mobs = {}
 
 def minecraft_mode():
     want2exit = False
@@ -24,15 +25,15 @@ def minecraft_mode():
             print("Exiting Minecraft mode...\n")
         # Brewing command
         elif command == commandList[2]:
-            page = requests.get(DEFAULT_LINK + "/Brewing")
-            content = BeautifulSoup(page.content, 'html.parser')
-            potions = {}
-            # Get content from base potions
-            potion_types = ["Base potions", "Positive effect potions", "Negative effect potions", "Mixed effect potions"]
-            for potion_type in potion_types:
-                table_rows = content.find("table", attrs={"data-description": potion_type}).find_all("tr")
-                for i in range(1, len(table_rows)):
-                    add_potion_to_dict(potions, table_rows[i])
+            if potions == {}:
+                page = requests.get(DEFAULT_LINK + "/Brewing")
+                content = BeautifulSoup(page.content, 'html.parser')
+                # Get content from base potions
+                potion_types = ["Base potions", "Positive effect potions", "Negative effect potions", "Mixed effect potions"]
+                for potion_type in potion_types:
+                    table_rows = content.find("table", attrs={"data-description": potion_type}).find_all("tr")
+                    for i in range(1, len(table_rows)):
+                        add_potion_to_dict(potions, table_rows[i])
             # Display available potions to read up on
             print("\n")
             for item in potions.keys():
@@ -47,16 +48,16 @@ def minecraft_mode():
                 print("\nPotion not found")
         # Mob command
         elif command == commandList[3]:
-            page = requests.get(DEFAULT_LINK + "/Mob")
-            content = BeautifulSoup(page.content, 'html.parser')
-            mobs = {}
-            # Retrieve passive mobs
-            mob_types = ["Passive mobs", "Neutral mobs", "Hostile mobs", "Boss mobs"]
-            for mob_type in mob_types:
-                for base_item in content.find_all("table", attrs={"data-description": mob_type}):
-                    for item in base_item.find_all("tr")[1].find_all("td"):
-                        anchor_tag = item.find("a")
-                        mobs[anchor_tag.text.lower()] = anchor_tag["href"]
+            if mobs == {}:
+                page = requests.get(DEFAULT_LINK + "/Mob")
+                content = BeautifulSoup(page.content, 'html.parser')
+                # Retrieve the mobs
+                mob_types = ["Passive mobs", "Neutral mobs", "Hostile mobs", "Boss mobs"]
+                for mob_type in mob_types:
+                    for base_item in content.find_all("table", attrs={"data-description": mob_type}):
+                        for item in base_item.find_all("tr")[1].find_all("td"):
+                            anchor_tag = item.find("a")
+                            mobs[anchor_tag.text.lower()] = anchor_tag["href"]
             # Display available mobs to view
             print("\n")
             for item in mobs.keys(): print(item)
@@ -74,6 +75,9 @@ def minecraft_mode():
                         print("\t" + re.sub(r"\n+", "\n", paragraph.text).replace("\n","\n\t"))
             else:
                 print("\nNo mob by that name found")
+        # Command not found
+        else:
+            print("Command not found. Type 'help' to see all available commands")
 
 
 
