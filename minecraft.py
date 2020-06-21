@@ -3,9 +3,10 @@ from bs4 import BeautifulSoup
 import re
 
 DEFAULT_LINK = "https://minecraft.gamepedia.com"
-commandList = ["help", "back", "brewing", "mob"]
+commandList = ["help", "back", "brewing", "mob", "block"]
 potions = {}
 mobs = {}
+blocks = {}
 
 def minecraft_mode():
     want2exit = False
@@ -75,6 +76,40 @@ def minecraft_mode():
                         print("\t" + re.sub(r"\n+", "\n", paragraph.text).replace("\n","\n\t"))
             else:
                 print("\nNo mob by that name found")
+        # Block command
+        elif command == commandList[4]:
+            # Fill array with links if need be
+            if blocks == {}:
+                blocks_array = BeautifulSoup(requests.get(DEFAULT_LINK + "/Block").content, 'html.parser').find("div", class_="collapsible-content").find_all("li")
+                for block in blocks_array:
+                    blocks[block.text.lower().strip()] = block.find_all("a")[len(block.find_all("a")) - 1]["href"]
+            block = input("What block would you like to see? ")
+            if block in blocks:
+                block_page = BeautifulSoup(requests.get(DEFAULT_LINK + blocks[block]).content, 'html.parser')
+                block_table_info = block_page.find("table", class_="infobox-rows").find_all("tr")
+                # Display the block
+                print("\n\n" + "~" * 20 + "\n" + block_page.find("div", class_="mcwiki-header infobox-title").text.upper().strip() + "\n" + "~" * 20 + "\n")
+                # Display info from infobox
+                for row in block_table_info:
+                    print(row.find("th").text.replace("\n","") + ": ")
+                    for paragraph in row.find("td").find_all("p"):
+                        for span in paragraph.find_all("span"):
+                            try:
+                                if span["class"] is ["sprite", "inv-sprite"] or ["sprite", "slot-sprite"]: pass
+                                else: span.replace_with("")
+                            except:
+                                span.replace_with("")
+                        for br in paragraph.find_all("br"):
+                            br.replace_with("_")
+                        if paragraph.find("span", class_="sprite inv-sprite") is not None: 
+                            print("\t" + paragraph.find("span", class_="sprite inv-sprite")["title"])
+                        elif paragraph.find("span", class_="sprite slot-sprite") is not None: 
+                            print("\t" + paragraph.find("a")["title"])
+                        else: 
+                            print("\t" + re.sub(r"\n+", "", paragraph.text).replace("_","\n\t"))
+                # TODO: Display info from crafting/smelting (if possible)
+            else:
+                print("\nNo block by that name found")
         # Command not found
         else:
             print("Command not found. Type 'help' to see all available commands")
