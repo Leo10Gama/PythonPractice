@@ -141,6 +141,12 @@ def minecraft_mode():
                                     print("\nSmelting:")
                                     for recipe in smelt_rows:
                                         print_smelting_recipe(recipe)
+                                # Stonecutting recipes exist
+                                elif tag['data-description'] == "Cutting recipes":
+                                    cut_rows = tag.find_all("tr")
+                                    print("\nStonecutting:")
+                                    for recipe in cut_rows:
+                                        print_stonecutting_recipe(recipe)
                             # Not the right div
                             else:
                                 continue
@@ -263,3 +269,40 @@ def print_smelting_recipe(table_row):
                 "span", class_="sprite inv-sprite")["title"]
         for key in output.keys():
             print("\t" + key + ": " + output[key])
+
+# Pre: table_row is a <tr> element that contains the data necessary to produce a stonecutting recipe
+# Post: The input and output for cutting a block is provided
+def print_stonecutting_recipe(table_row):
+    if bool(table_row.find_all("td")):
+        output = {}
+        recipe_input = list(table_row.find("span", class_="mcui-input").children)[0]
+        if "animated" in recipe_input["class"]:
+            temp = []
+            for item in recipe_input.children:
+                if bool(item.find("span", class_="sprite inv-sprite")):
+                    temp.append(item.find("span", class_="sprite inv-sprite")["title"])
+                else:
+                    temp.append(item.find("img")["alt"])
+            output["Input"] = " / ".join(temp)
+        else:
+            if bool(recipe_input.find("span", class_="sprite inv-sprite")):
+                output["Input"] = recipe_input.find("span", class_="sprite inv-sprite")["title"]
+            else:
+                output["Input"] = recipe_input.find("img")["alt"]
+        recipe_output = list(table_row.find("span", class_="mcui-output").children)[0]
+        if "animated" in recipe_output["class"]:
+            temp = []
+            for item in recipe_output.children:
+                if bool(item.find("span", class_="sprite inv-sprite")):
+                    temp.append(item.find("span", class_="sprite inv-sprite")["title"])
+                else:
+                    temp.append(item.find("img")["alt"])
+            output["Output"] = " / ".join(temp)
+        else:
+            if bool(recipe_output.find("span", class_="sprite inv-sprite")):
+                output["Output"] = recipe_output.find("span", class_="sprite inv-sprite")["title"]
+            else:
+                output["Output"] = recipe_output.find("img")["alt"]
+        for key in output.keys():
+            print("\t" + key + ": " + output[key])
+        print("\n")
