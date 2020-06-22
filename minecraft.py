@@ -101,13 +101,70 @@ def minecraft_mode():
                                 span.replace_with("")
                         for br in paragraph.find_all("br"):
                             br.replace_with("_")
-                        if paragraph.find("span", class_="sprite inv-sprite") is not None: 
-                            print("\t" + paragraph.find("span", class_="sprite inv-sprite")["title"])
-                        elif paragraph.find("span", class_="sprite slot-sprite") is not None: 
+                        if paragraph.find("span", class_="sprite slot-sprite") is not None: 
                             print("\t" + paragraph.find("a")["title"])
+                        if paragraph.find("span", class_="sprite inv-sprite") is not None: 
+                            print("\t" + paragraph.find("span", class_="sprite inv-sprite").parent["title"])
                         else: 
                             print("\t" + re.sub(r"\n+", "", paragraph.text).replace("_","\n\t"))
-                # TODO: Display info from crafting/smelting (if possible)
+                # Display info from crafting/smelting (if possible)
+                try:
+                    for tag in block_page.find("span", id="Obtaining").parent.next_siblings:
+                        if tag.name == "table":
+                            # Crafting recipes exist
+                            if tag.has_attr("data-description"): 
+                                if tag["data-description"] == "Crafting recipes":
+                                    craft_rows = tag.find_all("tr")
+                                    print("Crafting:")
+                                    for recipe in craft_rows:
+                                        if bool(recipe.find_all("td")):
+                                            print("\t_______\n\t|1|2|3|\n\t-------\n\t|4|5|6| -> 10\n\t-------\n\t|7|8|9|\n\t-------")
+                                            counter = 1
+                                            output = {}
+                                            recipe_input = recipe.find("span", class_="mcui-input")
+                                            # Get table input
+                                            for row in recipe_input.children:
+                                                for invslot in row.children:
+                                                    if "animated" in invslot["class"]:
+                                                        return_val = []
+                                                        for item in invslot.children:
+                                                            return_val.append(item.find("a")["title"])
+                                                        output[counter] = " / ".join(return_val)
+                                                    elif bool(invslot.find("a")):
+                                                        output[counter] = invslot.find("a")["title"]
+                                                    else:
+                                                        if bool(list(invslot.children)):
+                                                            output[counter] = invslot.find("span", class_="sprite inv-sprite")["title"]
+                                                    counter += 1
+                                            recipe_output = recipe.find("span", class_="mcui-output")
+                                            # Get table output
+                                            if "animated" in recipe_output.find("span")["class"]:
+                                                return_val = []
+                                                return_val.append(recipe_output.find("span", class_="invslot-item animated-active").find("a")["title"])
+                                                for item in recipe_output.find("span", class_="invslot-item animated-active").next_siblings:
+                                                    return_val.append(item.find("a")["title"])
+                                                if bool(recipe_output.find("span", class_="invslot-stacksize")):
+                                                    output[10] = " / ".join(return_val) + " x " + recipe_output.find("span", class_="invslot-stacksize").text
+                                                else:
+                                                    output[10] = " / ".join(return_val)
+                                            else:
+                                                if bool(recipe_output.find("span", class_="invslot-stacksize")):
+                                                    output[10] = recipe_output.find("span", class_="sprite inv-sprite")["title"] + " x " + recipe_output.find("span", class_="invslot-stacksize").text
+                                                else:
+                                                    output[10] = recipe_output.find("span", class_="sprite inv-sprite")["title"]
+                                            for key in output.keys():
+                                                print("\t" + str(key) + " - " + output[key])
+                            # Smelting recipes exist
+                            elif bool(tag.find("table", attrs={"data-description": "Smelting recipes"})):
+                                # TODO: Get smelting recipes if possible
+                                pass
+                            # Not the right div
+                            else:
+                                continue
+                        elif tag.name == "h2":
+                            break
+                except:
+                    print("fucked up somehow")
             else:
                 print("\nNo block by that name found")
         # Command not found
