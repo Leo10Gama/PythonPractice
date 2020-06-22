@@ -184,23 +184,33 @@ def print_crafting_recipe(table_row):
                 if "animated" in invslot["class"]:
                     return_val = []
                     for item in invslot.children:
-                        return_val.append(item.find("a")["title"])
+                        if bool(item.find("span", class_="sprite inv-sprite")):
+                            return_val.append(
+                                item.find("span", class_="sprite inv-sprite")["title"])
+                        else:
+                            return_val.append(item.find("a")["title"])
                     output[counter] = " / ".join(return_val)
-                elif bool(invslot.find("a")):
-                    output[counter] = invslot.find("a")["title"]
+                elif bool(invslot.find("span", class_="sprite inv-sprite")):
+                    output[counter] = invslot.find(
+                        "span", class_="sprite inv-sprite")["title"] or return_val.append(item.find("a")["title"])
                 else:
                     if bool(list(invslot.children)):
-                        output[counter] = invslot.find(
-                            "span", class_="sprite inv-sprite")["title"]
+                        if bool(invslot.find("span", class_="sprite inv-sprite")):
+                            output[counter] = invslot.find(
+                                "span", class_="sprite inv-sprite")["title"]
+                        else:
+                            output[counter] = invslot.find("img")["alt"]
                 counter += 1
         recipe_output = table_row.find("span", class_="mcui-output")
         # Get table output
         if "animated" in recipe_output.find("span")["class"]:
             return_val = []
-            return_val.append(recipe_output.find(
-                "span", class_="invslot-item animated-active").find("a")["title"])
-            for item in recipe_output.find("span", class_="invslot-item animated-active").next_siblings:
-                return_val.append(item.find("a")["title"])
+            for item in recipe_output.find("span", class_="invslot animated invslot-large").children:
+                if bool(item.find("span", class_="sprite inv-sprite")):
+                    return_val.append(
+                        item.find("span", class_="sprite inv-sprite")["title"])
+                else:
+                    return_val.append(item.find("a")["title"])
             if bool(recipe_output.find("span", class_="invslot-stacksize")):
                 output[10] = " / ".join(return_val) + " x " + recipe_output.find(
                     "span", class_="invslot-stacksize").text
@@ -208,11 +218,18 @@ def print_crafting_recipe(table_row):
                 output[10] = " / ".join(return_val)
         else:
             if bool(recipe_output.find("span", class_="invslot-stacksize")):
-                output[10] = recipe_output.find("span", class_="sprite inv-sprite")[
-                    "title"] + " x " + recipe_output.find("span", class_="invslot-stacksize").text
+                if bool(recipe_output.find("span", class_="sprite inv-sprite")):
+                    output[10] = recipe_output.find("span", class_="sprite inv-sprite")[
+                        "title"] + " x " + recipe_output.find("span", class_="invslot-stacksize").text
+                else:
+                    output[10] = recipe_output.find("img")[
+                        "alt"] + " x " + recipe_output.find("span", class_="invslot-stacksize").text
             else:
-                output[10] = recipe_output.find(
-                    "span", class_="sprite inv-sprite")["title"]
+                if bool(recipe_output.find("span", class_="sprite inv-sprite")):
+                    output[10] = recipe_output.find(
+                        "span", class_="sprite inv-sprite")["title"]
+                else:
+                    output[10] = recipe_output.find("img")["alt"]
         for key in output.keys():
             print("\t" + str(key) + " - " + output[key])
 
@@ -222,7 +239,8 @@ def print_crafting_recipe(table_row):
 def print_smelting_recipe(table_row):
     if bool(table_row.find_all("td")):
         output = {}
-        recipe_input = list(table_row.find("span", class_="mcui-input").children)[0]
+        recipe_input = list(table_row.find(
+            "span", class_="mcui-input").children)[0]
         if "animated" in recipe_input["class"]:
             temp = []
             for item in recipe_input.children:
