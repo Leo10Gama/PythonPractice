@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import re
 
 DEFAULT_LINK = "https://minecraft.gamepedia.com"
-commandList = ["help", "back", "brewing", "mob", "block"]
+commandList = ["help", "back", "brewing", "mob", "block", "item"]
 potions = {}
 mobs = {}
 blocks = {}
@@ -83,8 +83,8 @@ def minecraft_mode():
                                             paragraph.text).replace("\n", "\n\t"))
             else:
                 print("\nNo mob by that name found")
-        # Block command
-        elif command == commandList[4]:
+        # Block / Item command
+        elif command == commandList[4] or command == commandList[5]:
             # Fill array with links if need be
             if blocks == {}:
                 blocks_array = BeautifulSoup(requests.get(
@@ -92,7 +92,15 @@ def minecraft_mode():
                 for block in blocks_array:
                     blocks[block.text.lower().strip()] = block.find_all("a")[
                         len(block.find_all("a")) - 1]["href"]
-            block = input("What block would you like to see? ")
+                items_array_temp = BeautifulSoup(requests.get(DEFAULT_LINK + "/Item").content, 'html.parser').find_all(
+                    "div", class_="div-col columns column-width")
+                items_array = []
+                for thing in items_array_temp:
+                    items_array = items_array + thing.find_all("li")
+                for item in items_array:
+                    blocks[item.text.lower().strip()] = item.find_all("a")[
+                        len(item.find_all("a")) - 1]["href"]
+            block = input("What block/item would you like to see? ")
             if block in blocks:
                 block_page = BeautifulSoup(requests.get(
                     DEFAULT_LINK + blocks[block]).content, 'html.parser')
@@ -155,7 +163,7 @@ def minecraft_mode():
                 except:
                     print("Something went wrong :/")
             else:
-                print("\nNo block by that name found")
+                print("\nNo block/item by that name found")
         # Command not found
         else:
             print("Command not found. Type 'help' to see all available commands")
@@ -272,35 +280,43 @@ def print_smelting_recipe(table_row):
 
 # Pre: table_row is a <tr> element that contains the data necessary to produce a stonecutting recipe
 # Post: The input and output for cutting a block is provided
+
+
 def print_stonecutting_recipe(table_row):
     if bool(table_row.find_all("td")):
         output = {}
-        recipe_input = list(table_row.find("span", class_="mcui-input").children)[0]
+        recipe_input = list(table_row.find(
+            "span", class_="mcui-input").children)[0]
         if "animated" in recipe_input["class"]:
             temp = []
             for item in recipe_input.children:
                 if bool(item.find("span", class_="sprite inv-sprite")):
-                    temp.append(item.find("span", class_="sprite inv-sprite")["title"])
+                    temp.append(
+                        item.find("span", class_="sprite inv-sprite")["title"])
                 else:
                     temp.append(item.find("img")["alt"])
             output["Input"] = " / ".join(temp)
         else:
             if bool(recipe_input.find("span", class_="sprite inv-sprite")):
-                output["Input"] = recipe_input.find("span", class_="sprite inv-sprite")["title"]
+                output["Input"] = recipe_input.find(
+                    "span", class_="sprite inv-sprite")["title"]
             else:
                 output["Input"] = recipe_input.find("img")["alt"]
-        recipe_output = list(table_row.find("span", class_="mcui-output").children)[0]
+        recipe_output = list(table_row.find(
+            "span", class_="mcui-output").children)[0]
         if "animated" in recipe_output["class"]:
             temp = []
             for item in recipe_output.children:
                 if bool(item.find("span", class_="sprite inv-sprite")):
-                    temp.append(item.find("span", class_="sprite inv-sprite")["title"])
+                    temp.append(
+                        item.find("span", class_="sprite inv-sprite")["title"])
                 else:
                     temp.append(item.find("img")["alt"])
             output["Output"] = " / ".join(temp)
         else:
             if bool(recipe_output.find("span", class_="sprite inv-sprite")):
-                output["Output"] = recipe_output.find("span", class_="sprite inv-sprite")["title"]
+                output["Output"] = recipe_output.find(
+                    "span", class_="sprite inv-sprite")["title"]
             else:
                 output["Output"] = recipe_output.find("img")["alt"]
         for key in output.keys():
