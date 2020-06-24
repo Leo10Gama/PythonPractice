@@ -93,7 +93,7 @@ def map_country(country):
 
 
 def browse_catalogue():
-    country = input("Enter country: ").lower()
+    country = input("Enter country: ").lower().strip()
     search = input("Search: ")
     search = "+".join(search.lower().split())
     search_country = map_country(country)
@@ -122,7 +122,7 @@ def browse_catalogue():
             if next_exists:
                 print("<n> Next page")
             num = input(
-                "\nWhich coin would you like to see? (Enter the number): ")
+                "\nWhich coin would you like to see? (Enter the number): ").strip()
             if num == "p" and prev_exists:
                 prev_link = results.find('div', class_='catalogue_navigation').find(
                     'a', rel='prev')['href']

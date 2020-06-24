@@ -12,7 +12,7 @@ want2exit = False
 
 # Here is the main function
 while not want2exit:
-    command = input("Please enter a command (or type 'help'): ").lower()
+    command = input("Please enter a command (or type 'help'): ").lower().strip()
     print("\n")
     if command in commandList:
         # Help command

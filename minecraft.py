@@ -13,7 +13,7 @@ def minecraft_mode():
     want2exit = False
     while not want2exit:
         command = input(
-            "\nPlease enter a Minecraft command (or 'help' to see all): ").lower()
+            "\nPlease enter a Minecraft command (or 'help' to see all): ").lower().strip()
         # List all commands
         if command == commandList[0]:
             print("\n")
@@ -43,7 +43,7 @@ def minecraft_mode():
             for item in potions.keys():
                 print(item)
             potion = input(
-                "\nWhich potion would you like to know how to brew? ")
+                "\nWhich potion would you like to know how to brew? ").strip()
             # Get potion info
             if potion in potions.keys():
                 print("\nName: " + potions[potion]["name"] + "Brewing ingredient: " + potions[potion]
@@ -67,7 +67,7 @@ def minecraft_mode():
             print("\n")
             for item in mobs.keys():
                 print(item)
-            mob = input("\nWhich mob would you like to see? ").lower()
+            mob = input("\nWhich mob would you like to see? ").lower().strip()
             if mob in mobs:
                 mob_info = BeautifulSoup(requests.get(
                     DEFAULT_LINK + mobs[mob]).content, 'html.parser').find("table", class_="infobox-rows").find_all("tr")
@@ -100,7 +100,7 @@ def minecraft_mode():
                 for item in items_array:
                     blocks[item.text.lower().strip()] = item.find_all("a")[
                         len(item.find_all("a")) - 1]["href"]
-            block = input("What block/item would you like to see? ")
+            block = input("What block/item would you like to see? ").strip()
             if block in blocks:
                 block_page = BeautifulSoup(requests.get(
                     DEFAULT_LINK + blocks[block]).content, 'html.parser')
